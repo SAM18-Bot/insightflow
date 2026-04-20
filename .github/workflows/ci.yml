@@ -22,8 +22,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
       # 3. Setup Python
       - name: Setup Python
@@ -34,82 +32,65 @@ jobs:
       # 4. Install frontend deps
       - name: Install frontend dependencies
         working-directory: frontend
-        run: npm ci
+        run: npm install
 
-      # 5. Ensure ResizeObserver exists in Jest setup (CI guard)
-      - name: Patch Jest setup for ResizeObserver
-        working-directory: frontend
-        run: |
-          if [ -f src/setupTests.js ] && ! grep -q "ResizeObserverMock" src/setupTests.js; then
-            cat <<'EOF' >> src/setupTests.js
-
-// CI polyfill for jsdom + recharts ResponsiveContainer
-class ResizeObserverMock {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-global.ResizeObserver = global.ResizeObserver || ResizeObserverMock;
-EOF
-          fi
-
-      # 6. Run frontend tests
+      # 5. Run frontend tests
       - name: Run Jest tests
         working-directory: frontend
         env:
           CI: true
-        run: npm test -- --watchAll=false --coverage
+        run: npm test
 
-      # 7. Build frontend
+      # 6. Build frontend
       - name: Build frontend
         working-directory: frontend
         run: npm run build
 
-      # 8. Install backend deps
+      # 7. Install backend deps
       - name: Install backend dependencies
         working-directory: backend
         run: pip install -r requirements.txt
 
-      # 9. Run backend tests
+      # 8. Run backend tests
       - name: Run backend tests
         working-directory: backend
         run: pytest
 
-      # 10. Backend sanity check
+      # 9. Backend sanity check
       - name: Compile backend
         run: python -m compileall backend
 
-      # 11. SonarCloud Scan
+      # 10. SonarCloud Scan
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      # 12. Docker login
+      # 11. Docker login
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 13. Build Docker image
+      # 12. Build Docker image
       - name: Build Docker image
         run: docker build -t $IMAGE_NAME:${{ github.sha }} -t $IMAGE_NAME:latest .
 
-      # 14. Push Docker image
+      # 13. Push Docker image
       - name: Push Docker image
         run: |
           docker push $IMAGE_NAME:${{ github.sha }}
           docker push $IMAGE_NAME:latest
 
-      # 15. Trigger Render deploy
+      # 14. Trigger Render deploy
       - name: Trigger Render deploy
         if: ${{ env.RENDER_DEPLOY_HOOK_URL != '' }}
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
 
-      # 16. Deploy frontend to Netlify
+      # 15. Deploy to Netlify
       - name: Deploy frontend to Netlify
         if: ${{ env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != '' }}
         env:
