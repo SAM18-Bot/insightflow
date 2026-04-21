@@ -35,7 +35,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Run frontend unit tests (with coverage)
-        run: npm test -- --coverage --watchAll=false --ci
+        run: npx react-scripts test --coverage --watchAll=false --ci
         env:
           CI: true
 
