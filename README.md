@@ -35,7 +35,6 @@ InsightFlow is a production-ready React + FastAPI platform where users upload CS
 ├── Dockerfile
 ├── netlify.toml
 ├── render.yaml
-├── sonar-project.properties
 └── README.md
 ```
 
@@ -50,12 +49,10 @@ flowchart LR
     subgraph Platform CI/CD
       GH[GitHub Repo]
       GHA[GitHub Actions]
-      Sonar[SonarCloud]
       Hub[Docker Hub]
     end
 
     GH --> GHA
-    GHA --> Sonar
     GHA --> Hub
     Hub --> Render
 ```
@@ -72,10 +69,9 @@ Workflow: `.github/workflows/ci.yml` (trigger: push to `main`).
 4. Install backend dependencies (`pip install -r requirements.txt`)
 5. Run backend tests (`pytest`)
 6. Build backend artifact check (`python -m compileall backend`)
-7. SonarCloud scan (`SONAR_TOKEN`)
-8. Build and push Docker image to Docker Hub (`DOCKER_USERNAME`, `DOCKER_PASSWORD`)
-9. Trigger Render deploy hook (`RENDER_DEPLOY_HOOK_URL`)
-10. Deploy frontend to Netlify if site/token secrets exist
+7. Build and push Docker image to Docker Hub (`DOCKER_USERNAME`, `DOCKER_PASSWORD`)
+8. Trigger Render deploy hook (`RENDER_DEPLOY_HOOK_URL`)
+9. Deploy frontend to Netlify if site/token secrets exist
 
 ## 🐳 Docker
 
@@ -98,7 +94,6 @@ Required:
 
 - `DOCKER_USERNAME`
 - `DOCKER_PASSWORD`
-- `SONAR_TOKEN`
 
 Deployment:
 
@@ -154,7 +149,6 @@ Frontend (`frontend/.env.example`):
 
 - Frontend (Netlify): `https://your-netlify-site.netlify.app`
 - Backend (Render): `https://your-render-backend.onrender.com`
-- SonarCloud: `https://sonarcloud.io/project/overview?id=your-org_insightflow`
 - Docker Hub: `https://hub.docker.com/r/<docker-username>/insightflow`
 
 ## 🖼️ Screenshots
