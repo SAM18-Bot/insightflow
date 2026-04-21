@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import App from '../App';
 import * as api from '../services/api';
 
@@ -27,7 +27,7 @@ describe('App', () => {
 
     await waitFor(() => {
       expect(api.uploadCsv).toHaveBeenCalledTimes(1);
-      expect(screen.getByText('2')).toBeInTheDocument();
+      expect(within(screen.getByText('Rows').closest('div')).getByText('2')).toBeInTheDocument();
     });
   });
 
@@ -60,7 +60,7 @@ describe('App', () => {
       expect(api.filterDataset).toHaveBeenCalledWith(
         expect.objectContaining({ column: 'team', operator: 'equals', value: 'B' })
       );
-      expect(screen.getByText('1')).toBeInTheDocument();
+      expect(within(screen.getByText('Rows').closest('div')).getByText('1')).toBeInTheDocument();
     });
   });
 });

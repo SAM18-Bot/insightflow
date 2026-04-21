@@ -73,7 +73,7 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       - name: Run backend tests
-        run: pytest backend/tests/ -v --tb=short
+        run: PYTHONPATH=backend pytest backend/tests/ -v --tb=short
 
       - name: Compile-check backend (artifact sanity)
         run: python -m compileall backend
